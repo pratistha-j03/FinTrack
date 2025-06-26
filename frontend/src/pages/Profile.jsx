@@ -6,11 +6,11 @@ import Header from '../components/Header';
 
 function App() {
 
-  const [firstName, setFirstName] = useState('John');
-  const [lastName, setLastName] = useState('Doe');
-  const [email, setEmail] = useState('john.doe@example.com');
-  const [phoneNumber, setPhoneNumber] = useState('(555) 123-4567');
-  const [currency, setCurrency] = useState('USD');
+  const [firstName, setFirstName] = useState(' ');
+  const [lastName, setLastName] = useState(' ');
+  const [email, setEmail] = useState(' ');
+  const [phoneNumber, setPhoneNumber] = useState(' ');
+  const [currency, setCurrency] = useState('INR');
 
   const accountSummary = {
     memberSince: 'June 2022',
@@ -166,9 +166,6 @@ function App() {
                       value={currency}
                       onChange={(e) => setCurrency(e.target.value)}
                     >
-                      <option value="USD">USD - US Dollar</option>
-                      <option value="EUR">EUR - Euro</option>
-                      <option value="GBP">GBP - British Pound</option>
                       <option value="INR">INR - Indian Rupee</option>
 
                     </select>
@@ -190,10 +187,10 @@ function App() {
 
               <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 flex flex-col items-center text-center">
                 <div className="w-24 h-24 bg-black rounded-full flex items-center justify-center text-white text-3xl font-bold mb-4">
-                  JD
+                  {firstName[0]+lastName[0]}
                 </div>
-                <h4 className="text-lg font-semibold text-gray-800">John Doe</h4>
-                <p className="text-gray-500 text-sm mb-4">john.doe@example.com</p>
+                <h4 className="text-lg font-semibold text-gray-800">{firstName+" "+lastName}</h4>
+                <p className="text-gray-500 text-sm mb-4">{email}</p>
 
                 <div className="w-full space-y-3 text-left text-gray-700 text-sm">
                   <p>
