@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import {
-  PieChart, Pie, Cell, Tooltip, ResponsiveContainer // ResponsiveContainer added here
+  PieChart, Pie, Cell, Tooltip, ResponsiveContainer 
 } from 'recharts';
 import { Search, Bell, ChevronDown, Plus, Home, Utensils, Car, Lightbulb, Wallet, Goal, Settings, UserCircle, SlidersHorizontal, ListFilter } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 
 function App() {
-  // Dummy data for Budget Overview
+  
   const totalBudget = 5000;
   const spent = 3250;
   const remaining = totalBudget - spent;
@@ -23,7 +23,6 @@ function App() {
   const savingsToGo = savingsGoal - saved;
 
 
-  // Dummy data for Budget Categories
   const budgetCategories = [
     {
       id: 1,
@@ -32,7 +31,7 @@ function App() {
       spent: 1500,
       total: 1500,
       icon: Home,
-      color: '#4A5568', // Dark Grey
+      color: '#4A5568',
     },
     {
       id: 2,
@@ -41,7 +40,7 @@ function App() {
       spent: 650,
       total: 800,
       icon: Utensils,
-      color: '#718096', // Medium Grey
+      color: '#718096',
     },
     {
       id: 3,
@@ -50,7 +49,7 @@ function App() {
       spent: 320,
       total: 400,
       icon: Car,
-      color: '#A0AEC0', // Light Grey
+      color: '#A0AEC0', 
     },
     {
       id: 4,
@@ -59,7 +58,7 @@ function App() {
       spent: 200,
       total: 250,
       icon: Lightbulb,
-      color: '#CBD5E0', // Lighter Grey
+      color: '#CBD5E0', 
     },
     {
         id: 5,
@@ -67,8 +66,7 @@ function App() {
         description: 'Electricity, Water, Gas',
         spent: 180,
         total: 200,
-        icon: Bell, // Reusing Bell icon for utilities, consider a better one if available
-        color: '#E2E8F0', // Very Light Grey
+        color: '#E2E8F0', 
     },
     {
         id: 6,
@@ -76,12 +74,11 @@ function App() {
         description: 'Miscellaneous expenses',
         spent: 300,
         total: 400,
-        icon: Wallet, // Reusing Wallet icon for other
-        color: '#F7FAFC', // White-ish
+        icon: Wallet,
+        color: '#F7FAFC', 
     },
   ];
 
-  // Dummy data for Budget Distribution Pie Chart (monochrome)
   const budgetDistributionData = [
     { name: 'Housing', value: 30, color: '#4A5568' },
     { name: 'Food', value: 16, color: '#718096' },
@@ -94,14 +91,11 @@ function App() {
 
   return (
     <div className="flex min-h-screen bg-gray-100 font-sans">
-      {/* Sidebar Component */}
       <Sidebar />
 
-      {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
        <Header />
 
-        {/* Budget Content */}
         <main className="flex-1 overflow-auto p-6">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-3xl font-bold text-gray-800">Budget</h1>
@@ -125,13 +119,12 @@ function App() {
             </div>
           </div>
 
-          {/* Budget Overview Section */}
           <div className="bg-white p-6 rounded-xl shadow-md mb-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">Budget Overview</h3>
             <p className="text-gray-500 text-sm mb-4">May 1 - May 31, 2023</p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-gray-700">
-              {/* Total Budget */}
+          
               <div className="flex flex-col">
                 <p className="text-sm font-medium">Total Budget</p>
                 <div className="flex justify-between items-baseline mt-1">
@@ -144,7 +137,6 @@ function App() {
                 <p className="text-sm mt-1 text-gray-500">${remaining} left</p>
               </div>
 
-              {/* Daily Average */}
               <div className="flex flex-col">
                 <p className="text-sm font-medium">Daily Average</p>
                 <div className="flex justify-between items-baseline mt-1">
@@ -156,7 +148,6 @@ function App() {
                 </p>
               </div>
 
-              {/* Savings Goal */}
               <div className="flex flex-col">
                 <p className="text-sm font-medium">Savings Goal</p>
                 <div className="flex justify-between items-baseline mt-1">
@@ -171,9 +162,8 @@ function App() {
             </div>
           </div>
 
-          {/* Budget Categories and Distribution Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Budget Categories List */}
+          
             <div className="bg-white p-6 rounded-xl shadow-md">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold text-gray-800">Budget Categories</h3>
@@ -216,7 +206,6 @@ function App() {
               </div>
             </div>
 
-            {/* Budget Distribution Chart */}
             <div className="bg-white p-6 rounded-xl shadow-md">
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Budget Distribution</h3>
               <div className="flex flex-col sm:flex-row items-center justify-center">

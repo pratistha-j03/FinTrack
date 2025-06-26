@@ -1,16 +1,42 @@
 import React, { useState } from 'react';
 import { Mail, Lock } from 'lucide-react'; 
+import { useNavigate } from 'react-router-dom';
 
 function App() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
 
-  const handleSignIn = (e) => {
+  const handleSignIn = async (e) => {
     e.preventDefault();
-    console.log('Signing in with:', { email, password, rememberMe });
+    console.log('Signing in with:', { email, password});
+    try{
+      const res = await fetch("http://localhost:4000/api/users/login", {
+        method: "POST",
+        headers:{ 
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email, password  })
+      });
+    
+      const data = await res.json();
+
+    if(res.ok){
+      localStorage.setItem('token', data.token);
+      console.log("Login successful, token:", data.token);
+      navigate('/');
+    }
+    else{
+      alert(data.message || "Login failed");
+    }
+  }
+  catch(err){
+    console.error("Login error:", err.message);
+    alert("Login failed. Please check your credentials.");
+  }
    
-  };
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center font-sans">

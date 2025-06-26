@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Bell, ChevronDown, UserCircle } from 'lucide-react';
 
-import Sidebar from '../components/Sidebar'; 
+import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 
 function App() {
@@ -18,36 +18,87 @@ function App() {
     lastLogin: 'Today, 10:30 AM',
   };
 
-  const handleSaveChanges = () => {
-    console.log('Saving changes:', { firstName, lastName, email, phoneNumber, currency });
-    
+  useEffect(() => {
+    const getProfile = async () => {
+      const token = localStorage.getItem('token');
+
+      try {
+        const res = await fetch('http://localhost:4000/api/users/profile', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        const data = await res.json();
+        console.log('Profile data:', data);
+
+        setFirstName(data.firstName || ' ');
+        setLastName(data.lastName || ' ');
+        setEmail(data.email || ' ');
+        setPhoneNumber(data.phoneNumber || '');
+      } catch (err) {
+        console.error('Failed to fetch profile:', err);
+      }
+    };
+
+    getProfile();
+  }, []);
+
+  const handleSaveChanges = async () => {
+    const token = localStorage.getItem('token');
+
+    try {
+      const res = await fetch('http://localhost:4000/api/users/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          phoneNumber,
+          
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert('Profile updated!');
+      } else {
+        alert(data.message || 'Update failed');
+      }
+    } catch (err) {
+      console.error('Update failed:', err);
+      alert('Something went wrong');
+    }
   };
 
   const handleChangePassword = () => {
     console.log('Changing password...');
-    
+
   };
 
   const handleDeleteAccount = () => {
     console.log('Deleting account...');
-   
+
   };
 
   return (
     <div className="flex h-screen bg-gray-100 font-sans">
-      
+
       <Sidebar />
 
-     
+
       <div className="flex-1 flex flex-col overflow-hidden">
-    
+
         <main className="flex-1 overflow-auto p-6">
           <div className="bg-white p-6 rounded-xl shadow-md">
             <h2 className="text-2xl font-bold text-gray-800">Profile</h2>
             <p className="text-gray-500 mt-1">Manage your account settings</p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-           
+
               <div className="md:col-span-2 bg-gray-50 p-6 rounded-xl border border-gray-200">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4">Personal Information</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -87,7 +138,7 @@ function App() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    readOnly 
+                    readOnly
                   />
                 </div>
 
@@ -119,7 +170,7 @@ function App() {
                       <option value="EUR">EUR - Euro</option>
                       <option value="GBP">GBP - British Pound</option>
                       <option value="INR">INR - Indian Rupee</option>
-                    
+
                     </select>
                     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                       <ChevronDown size={16} />

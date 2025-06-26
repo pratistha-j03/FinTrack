@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Mail, Lock, Phone, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 function SignUp() {
+  const navigate = useNavigate();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
@@ -12,7 +14,7 @@ function SignUp() {
     e.preventDefault();
     console.log('Signing up with:', { firstName, lastName, phone, email, password });
      try {
-      const res = await fetch("http://localhost:5000/api/users/register", {
+      const res = await fetch("http://localhost:4000/api/users/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -30,6 +32,7 @@ function SignUp() {
       if (res.ok) {
         alert("Signup successful!");
         console.log("User created:", data);
+        navigate('/Login');
       } else {
         alert("Signup failed");
       }
