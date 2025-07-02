@@ -1,4 +1,3 @@
-const { FindCursor } = require('mongodb');
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
@@ -25,7 +24,7 @@ const UserSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
-    Transactions: [
+    transactions: [
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Transaction'
@@ -35,7 +34,7 @@ const UserSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    Budgets: [
+    budgets: [
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Budget'

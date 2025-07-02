@@ -1,26 +1,37 @@
 const mongoose = require('mongoose');
 
 const TransactionSchema = new mongoose.Schema({
-    userId: {
+    user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
+    },
+    description: {
+        type: String,
+
     },
     amount: {
         type: Number,
         required: true
     },
+    category: {
+        type: String,
+        required: true,
+    },
     type: {
         type: String,
-        enum: ['Credit', 'Debit'],
-        required: true
+        enum: ['Income', 'Expense'],
+        required: true,
     },
     date: {
         type: Date,
-        default: Date.now
+        default: () => {
+            const now = new Date();
+            return new Date(now.getFullYear(), now.getMonth(), now.getDate()); // removes time
+        }
     }
 });
 
-const Transaction = mongoose.model('transaction', TransactionSchema);
+const Transaction = mongoose.model('Transaction', TransactionSchema);
 
 module.exports = Transaction;

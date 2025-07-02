@@ -5,51 +5,119 @@ import Header from '../components/Header';
 const App = () => {
   const [activeMenuItem, setActiveMenuItem] = useState('Transactions');
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeFilter, setActiveFilter] = useState('All'); 
+  const [activeFilter, setActiveFilter] = useState('All');
   const [timeFilter, setTimeFilter] = useState('This Month');
   const [transactions, setTransactions] = useState([]);
   const [showAddTransactionModal, setShowAddTransactionModal] = useState(false);
   const [showEditTransactionModal, setShowEditTransactionModal] = useState(false);
   const [currentTransaction, setCurrentTransaction] = useState(null);
+  const [type, setType] = useState('Expense');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  const fetchTransactions = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch('http://localhost:4000/api/transactions', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setTransactions(data);
+      } else {
+        alert(data.message || 'Failed to load transactions');
+      }
+    } catch (err) {
+      console.error('Error fetching transactions:', err);
+    }
+  };
 
   useEffect(() => {
-    const mockTransactions = [
-      { id: 1, date: 'Jun 15, 2023', description: 'Salary Deposit', category: 'Income', amount: 5250.00, type: 'income' },
-      { id: 2, date: 'Jun 14, 2023', description: 'Grocery Shopping', category: 'Food', amount: -85.75, type: 'expense' },
-      { id: 3, date: 'Jun 12, 2023', description: 'Online Shopping', category: 'Shopping', amount: -124.99, type: 'expense' },
-      { id: 4, date: 'Jun 10, 2023', description: 'Birthday Gift', category: 'Gifts', amount: -19.99, type: 'expense' },
-      { id: 5, date: 'Jun 8, 2023', description: 'Utility Bill', category: 'Utilities', amount: -78.50, type: 'expense' },
-      { id: 6, date: 'Jun 7, 2023', description: 'Freelance Payment', category: 'Income', amount: 300.00, type: 'income' },
-      { id: 7, date: 'Jun 6, 2023', description: 'Restaurant Dinner', category: 'Food', amount: -45.00, type: 'expense' },
-      { id: 8, date: 'Jun 5, 2023', description: 'Subscription Service', category: 'Entertainment', amount: -15.00, type: 'expense' },
-    ];
-    setTransactions(mockTransactions);
+    fetchTransactions();
   }, []);
 
   const handleMenuItemClick = (item) => {
     setActiveMenuItem(item);
-    
+
   };
 
   const filteredTransactions = transactions.filter(transaction => {
-    const matchesSearch = transaction.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = activeFilter === 'All' || transaction.type === activeFilter.toLowerCase();
-  
-    const matchesTime = timeFilter === 'This Month' ? transaction.date.includes('Jun') : true; 
+    const matchesSearch = (transaction.description || '').toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter = activeFilter === 'All' || (transaction.type || '').toLowerCase() === activeFilter.toLowerCase();
+
+
+    const date = new Date(transaction.date);
+    const currentMonth = new Date().getMonth();
+    const matchesTime =
+      timeFilter === 'This Month'
+        ? date.getMonth() === currentMonth
+        : true;
 
     return matchesSearch && matchesFilter && matchesTime;
   });
 
-  const handleAddTransaction = (newTransaction) => {
-    setTransactions(prev => [...prev, { ...newTransaction, id: prev.length + 1, date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) }]);
-    setShowAddTransactionModal(false);
+
+  const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+
+  const paginatedTransactions = filteredTransactions.slice(startIndex, endIndex);
+
+
+  const handleAddTransaction = async (newTransaction) => {
+    // setTransactions(prev => [...prev, { ...newTransaction, id: prev.length + 1, date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) }]);
+    // setShowAddTransactionModal(false);
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch('http://localhost:4000/api/transactions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(newTransaction)
+      });
+      const data = await res.json();
+      setTransactions(prev => [data, ...prev]); // update UI
+      setShowAddTransactionModal(false);
+    } catch (error) {
+      console.error("Add transaction error:", error);
+    }
   };
 
-  const handleEditTransaction = (updatedTransaction) => {
-    setTransactions(prev => prev.map(t => t.id === updatedTransaction.id ? updatedTransaction : t));
-    setShowEditTransactionModal(false);
-    setCurrentTransaction(null);
-  };
+  const handleEditTransaction = async (updatedTransaction) => {
+  const token = localStorage.getItem('token');
+
+  try {
+    const res = await fetch(`http://localhost:4000/api/transactions/${updatedTransaction._id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(updatedTransaction),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      setTransactions(prev =>
+        prev.map(t => t._id === data._id ? data : t)
+      );
+      setShowEditTransactionModal(false);
+      setCurrentTransaction(null);
+    } else {
+      console.error(data.message);
+      alert(data.message || "Update failed");
+    }
+  } catch (err) {
+    console.error("Edit transaction error:", err);
+    alert("Something went wrong");
+  }
+};
+
 
   const handleDeleteTransaction = (id) => {
     setTransactions(prev => prev.filter(t => t.id !== id));
@@ -64,11 +132,11 @@ const App = () => {
     const [description, setDescription] = useState(initialData?.description || '');
     const [amount, setAmount] = useState(initialData?.amount || '');
     const [category, setCategory] = useState(initialData?.category || '');
-    const [type, setType] = useState(initialData?.type || 'expense');
+    const [type, setType] = useState(initialData?.type || 'Expense');
 
     const handleSubmit = (e) => {
       e.preventDefault();
-      const newAmount = type === 'expense' ? -Math.abs(parseFloat(amount)) : Math.abs(parseFloat(amount));
+      const newAmount = type === 'Expense' ? -Math.abs(parseFloat(amount)) : Math.abs(parseFloat(amount));
       onSubmit({ ...initialData, description, amount: newAmount, category, type });
     };
 
@@ -120,8 +188,8 @@ const App = () => {
                 value={type}
                 onChange={(e) => setType(e.target.value)}
               >
-                <option value="expense">Expense</option>
-                <option value="income">Income</option>
+                <option value="Expense">Expense</option>
+                <option value="Income">Income</option>
               </select>
             </div>
             <div className="flex justify-end gap-2">
@@ -148,14 +216,14 @@ const App = () => {
 
   return (
     <div className="flex font-inter">
-  
+
       <script src="https://cdn.tailwindcss.com"></script>
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
       <Sidebar activeItem={activeMenuItem} onMenuItemClick={handleMenuItemClick} />
 
       <div className="flex-1 p-8 bg-gray-100 min-h-screen rounded-l-lg shadow-inner">
-        
+
         <section className="bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Transactions</h2>
           <p className="text-gray-600 mb-6">Manage your income and expenses</p>
@@ -177,9 +245,9 @@ const App = () => {
                 Income
               </button>
               <button
-                onClick={() => setActiveFilter('Expenses')}
+                onClick={() => setActiveFilter('Expense')}
                 className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200
-                  ${activeFilter === 'Expenses' ? 'bg-black text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                  ${activeFilter === 'Expense' ? 'bg-black text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
               >
                 Expenses
               </button>
@@ -187,7 +255,7 @@ const App = () => {
 
             <div className="flex space-x-2">
               <select
-                value={timeFilter}
+                // value={timeFilter}
                 onChange={(e) => setTimeFilter(e.target.value)}
                 className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
@@ -196,10 +264,7 @@ const App = () => {
                 <option>This Year</option>
                 <option>All Time</option>
               </select>
-              <button className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 flex items-center space-x-2 hover:bg-gray-50">
-                <span>▼</span>
-                <span>Filter</span>
-              </button>
+
               <button
                 onClick={() => setShowAddTransactionModal(true)}
                 className="bg-black text-white font-bold py-2 px-4 rounded-lg flex items-center space-x-2 shadow-md transition-all duration-200"
@@ -224,20 +289,20 @@ const App = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredTransactions.map((transaction) => (
+                {paginatedTransactions.map((transaction) => (
                   <tr key={transaction.id}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.date}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{transaction.description}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
                         className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                          ${transaction.type === 'income' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
+                          ${transaction.type === 'Income' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
                       >
                         {transaction.category}
                       </span>
                     </td>
                     <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${transaction.amount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {transaction.amount >= 0 ? '+' : ''}${transaction.amount.toFixed(2)}
+                      {transaction.amount >= 0 ? '+' : ''}₹{transaction.amount.toFixed(2)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button onClick={() => openEditModal(transaction)} className="text-black mr-3">
@@ -254,19 +319,30 @@ const App = () => {
           </div>
 
           <div className="flex justify-between items-center mt-6">
-            <span className="text-sm text-gray-600">Showing 1 to 5 of {filteredTransactions.length} results</span>
+            <span className="text-sm text-gray-600">
+              Showing {filteredTransactions.length === 0 ? 0 : startIndex + 1} to {Math.min(endIndex, filteredTransactions.length)} of {filteredTransactions.length} results
+            </span>
             <div className="flex space-x-2">
-              <button className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+              >
                 Previous
               </button>
               <button className="px-4 py-2 border border-black bg-black text-white rounded-lg">
-                1
+                {currentPage}
               </button>
-              <button className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+              >
                 Next
               </button>
             </div>
           </div>
+
         </section>
 
         <TransactionFormModal
