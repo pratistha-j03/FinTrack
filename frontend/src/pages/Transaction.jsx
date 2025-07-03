@@ -119,9 +119,29 @@ const App = () => {
 };
 
 
-  const handleDeleteTransaction = (id) => {
-    setTransactions(prev => prev.filter(t => t.id !== id));
-  };
+  const handleDeleteTransaction = async (id) => {
+  const token = localStorage.getItem('token');
+
+  try {
+    const res = await fetch(`http://localhost:4000/api/transactions/${id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (res.ok) {
+      setTransactions(prev => prev.filter(t => t._id !== id));
+    } else {
+      const data = await res.json();
+      alert(data.message || "Failed to delete");
+    }
+  } catch (err) {
+    console.error("Delete transaction error:", err);
+    alert("Something went wrong");
+  }
+};
+
 
   const openEditModal = (transaction) => {
     setCurrentTransaction(transaction);
@@ -290,7 +310,7 @@ const App = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {paginatedTransactions.map((transaction) => (
-                  <tr key={transaction.id}>
+                  <tr key={transaction._id}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.date}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{transaction.description}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -308,7 +328,7 @@ const App = () => {
                       <button onClick={() => openEditModal(transaction)} className="text-black mr-3">
                         ✏️
                       </button>
-                      <button onClick={() => handleDeleteTransaction(transaction.id)} className="text-red-600 hover:text-red-900">
+                      <button onClick={() => handleDeleteTransaction(transaction._id)} className="text-red-600 hover:text-red-900">
                         🗑️
                       </button>
                     </td>

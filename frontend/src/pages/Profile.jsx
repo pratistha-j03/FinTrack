@@ -11,12 +11,8 @@ function App() {
   const [email, setEmail] = useState(' ');
   const [phoneNumber, setPhoneNumber] = useState(' ');
   const [currency, setCurrency] = useState('INR');
-
-  const accountSummary = {
-    memberSince: 'June 2022',
-    totalTransactions: 42,
-    lastLogin: 'Today, 10:30 AM',
-  };
+  const [memberSince, setMemberSince] = useState(' ');
+  const [totalTransactions, setTotalTransactions] = useState(0);
 
   useEffect(() => {
     const getProfile = async () => {
@@ -36,6 +32,8 @@ function App() {
         setLastName(data.lastName || ' ');
         setEmail(data.email || ' ');
         setPhoneNumber(data.phoneNumber || '');
+        setMemberSince(data.createdAt ? new Date(data.createdAt).toLocaleDateString() : ' ');
+        setTotalTransactions(data.transactions ? data.transactions.length : 0);
       } catch (err) {
         console.error('Failed to fetch profile:', err);
       }
@@ -194,14 +192,14 @@ function App() {
 
                 <div className="w-full space-y-3 text-left text-gray-700 text-sm">
                   <p>
-                    <span className="font-medium">Member since:</span> {accountSummary.memberSince}
+                    <span className="font-medium">Member since:</span> {memberSince}
                   </p>
                   <p>
-                    <span className="font-medium">Total transactions:</span> {accountSummary.totalTransactions}
+                    <span className="font-medium">Total transactions:</span> {totalTransactions}
                   </p>
-                  <p>
-                    <span className="font-medium">Last login:</span> {accountSummary.lastLogin}
-                  </p>
+                  {/* <p>
+                    <span className="font-medium">Last login:</span> {new Date().toLocaleDateString()} at {new Date().toLocaleTimeString()}
+                  </p> */}
                 </div>
 
                 <div className="w-full mt-6 space-y-3">

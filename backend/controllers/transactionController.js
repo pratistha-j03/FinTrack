@@ -66,7 +66,25 @@ const updateTransaction = async (req, res) => {
   }
 };
 
+const deleteTransaction = async (req, res) => {
+  const { id } = req.params;
 
-module.exports = { addTransaction, getTransactions, updateTransaction };
+  try {
+    const transaction = await Transaction.findById(id);
+    if (!transaction) return res.status(404).json({ message: 'Transaction not found' });
+
+    if (transaction.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Unauthorized' });
+    }
+
+    await transaction.deleteOne();
+    res.json({ message: 'Transaction deleted' });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+
+module.exports = { addTransaction, getTransactions, updateTransaction, deleteTransaction };
 
 

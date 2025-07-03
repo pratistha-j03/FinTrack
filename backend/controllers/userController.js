@@ -82,6 +82,8 @@ const getProfile = async (req, res) => {
     lastName: req.user.lastName,
     email: req.user.email,
     phoneNumber: req.user.phoneNumber,
+    createdAt: user.createdAt,
+    transactions: user.transactions,
   }); 
 
   } catch (err) {
