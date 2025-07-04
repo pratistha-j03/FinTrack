@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
+import TransactionFormModal from '../components/TransactionForm';
+import { FiEdit, FiTrash2 } from 'react-icons/fi';
 
 const App = () => {
   const [activeMenuItem, setActiveMenuItem] = useState('Transactions');
@@ -88,149 +90,64 @@ const App = () => {
   };
 
   const handleEditTransaction = async (updatedTransaction) => {
-  const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token');
 
-  try {
-    const res = await fetch(`http://localhost:4000/api/transactions/${updatedTransaction._id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(updatedTransaction),
-    });
+    try {
+      const res = await fetch(`http://localhost:4000/api/transactions/${updatedTransaction._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(updatedTransaction),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (res.ok) {
-      setTransactions(prev =>
-        prev.map(t => t._id === data._id ? data : t)
-      );
-      setShowEditTransactionModal(false);
-      setCurrentTransaction(null);
-    } else {
-      console.error(data.message);
-      alert(data.message || "Update failed");
+      if (res.ok) {
+        setTransactions(prev =>
+          prev.map(t => t._id === data._id ? data : t)
+        );
+        setShowEditTransactionModal(false);
+        setCurrentTransaction(null);
+      } else {
+        console.error(data.message);
+        alert(data.message || "Update failed");
+      }
+    } catch (err) {
+      console.error("Edit transaction error:", err);
+      alert("Something went wrong");
     }
-  } catch (err) {
-    console.error("Edit transaction error:", err);
-    alert("Something went wrong");
-  }
-};
+  };
 
 
   const handleDeleteTransaction = async (id) => {
-  const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token');
 
-  try {
-    const res = await fetch(`http://localhost:4000/api/transactions/${id}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    try {
+      const res = await fetch(`http://localhost:4000/api/transactions/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    if (res.ok) {
-      setTransactions(prev => prev.filter(t => t._id !== id));
-    } else {
-      const data = await res.json();
-      alert(data.message || "Failed to delete");
+      if (res.ok) {
+        setTransactions(prev => prev.filter(t => t._id !== id));
+      } else {
+        const data = await res.json();
+        alert(data.message || "Failed to delete");
+      }
+    } catch (err) {
+      console.error("Delete transaction error:", err);
+      alert("Something went wrong");
     }
-  } catch (err) {
-    console.error("Delete transaction error:", err);
-    alert("Something went wrong");
-  }
-};
+  };
 
 
   const openEditModal = (transaction) => {
     setCurrentTransaction(transaction);
     setShowEditTransactionModal(true);
-  };
-
-  const TransactionFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
-    const [description, setDescription] = useState(initialData?.description || '');
-    const [amount, setAmount] = useState(initialData?.amount || '');
-    const [category, setCategory] = useState(initialData?.category || '');
-    const [type, setType] = useState(initialData?.type || 'Expense');
-
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      const newAmount = type === 'Expense' ? -Math.abs(parseFloat(amount)) : Math.abs(parseFloat(amount));
-      onSubmit({ ...initialData, description, amount: newAmount, category, type });
-    };
-
-    if (!isOpen) return null;
-
-    return (
-      <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
-        <div className="bg-white p-6 rounded-lg shadow-xl w-96 max-w-full">
-          <h2 className="text-xl font-bold mb-4">{initialData ? 'Edit Transaction' : 'Add New Transaction'}</h2>
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <label htmlFor="description" className="block text-gray-700 text-sm font-bold mb-2">Description</label>
-              <input
-                type="text"
-                id="description"
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="amount" className="block text-gray-700 text-sm font-bold mb-2">Amount</label>
-              <input
-                type="number"
-                id="amount"
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                value={Math.abs(amount)}
-                onChange={(e) => setAmount(e.target.value)}
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="category" className="block text-gray-700 text-sm font-bold mb-2">Category</label>
-              <input
-                type="text"
-                id="category"
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="type" className="block text-gray-700 text-sm font-bold mb-2">Type</label>
-              <select
-                id="type"
-                className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                value={type}
-                onChange={(e) => setType(e.target.value)}
-              >
-                <option value="Expense">Expense</option>
-                <option value="Income">Income</option>
-              </select>
-            </div>
-            <div className="flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={onClose}
-                className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="bg-black cursor-pointer text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline"
-              >
-                {initialData ? 'Update' : 'Add'}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    );
   };
 
 
@@ -326,10 +243,10 @@ const App = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button onClick={() => openEditModal(transaction)} className="text-black mr-3">
-                        ✏️
+                        <FiEdit size={16}/>
                       </button>
                       <button onClick={() => handleDeleteTransaction(transaction._id)} className="text-red-600 hover:text-red-900">
-                        🗑️
+                        <FiTrash2 size={16}/>
                       </button>
                     </td>
                   </tr>

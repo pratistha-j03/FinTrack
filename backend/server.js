@@ -5,6 +5,7 @@ const connectDB = require('./config/db');
 const cors = require('cors');
 const userRoutes = require('./routes/userRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
+const budgetRoutes = require('./routes/budgetRoutes');
 
 connectDB();
 const app = express();
@@ -13,6 +14,7 @@ app.use(cors());
 
 app.use('/api/users', userRoutes);
 app.use('/api/transactions', transactionRoutes);
+app.use('/api/budgets', budgetRoutes);
 
 app.get('/', (req, res) => {
   res.send('API is running...');
