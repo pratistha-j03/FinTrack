@@ -27,7 +27,7 @@ const TransactionSchema = new mongoose.Schema({
         type: Date,
         default: () => {
             const now = new Date();
-            return new Date(now.getFullYear(), now.getMonth(), now.getDate()); // removes time
+            return new Date(now.getFullYear(), now.getMonth(), now.getDate());
         }
     }
 });

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-const BudgetOverview = () => {
+const BudgetOverview = ({ month, year }) => {
   const [budgets, setBudgets] = useState([]);
   const [transactions, setTransactions] = useState([]);
 
@@ -31,22 +31,33 @@ const BudgetOverview = () => {
           transactionRes.json(),
         ]);
 
-        setBudgets(budgetData);
-        setTransactions(transactionData);
+        // Filter by month and year
+        const filteredBudgets = budgetData.filter((b) => {
+          const bDate = new Date(b.startDate);
+          return bDate.getMonth() === month && bDate.getFullYear() === year;
+        });
+
+        const filteredTransactions = transactionData.filter((t) => {
+          const tDate = new Date(t.date);
+          return tDate.getMonth() === month && tDate.getFullYear() === year;
+        });
+
+        setBudgets(filteredBudgets);
+        setTransactions(filteredTransactions);
       } catch (err) {
         console.error('Failed to fetch data:', err);
       }
     };
 
     fetchBudgetsAndTransactions();
-  }, []);
+  }, [month, year]);
 
-  const totalDays = 31; // Assume fixed date range for now
+  const totalDays = 31; // Placeholder for now
 
   const totalBudget = budgets.reduce((sum, b) => sum + b.amount, 0);
   const spent = transactions
-    .filter((txn) => txn.type === 'expense')
-    .reduce((sum, txn) => sum + txn.amount, 0);
+    .filter((txn) => txn.type.toLowerCase() === 'expense')
+    .reduce((sum, txn) => sum + Math.abs(txn.amount), 0);
   const remaining = totalBudget - spent;
 
   const dailyAverage = totalDays > 0 ? (spent / totalDays).toFixed(2) : 0;
@@ -73,7 +84,7 @@ const BudgetOverview = () => {
           </span>
         </div>
       </div>
-      <p className="text-sm text-gray-500 mb-5">May 1 - May 31, 2023</p>
+      <p className="text-sm text-gray-500 mb-5">{`${new Date(year, month).toLocaleString('default', { month: 'long' })} ${year}`}</p>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <div className="border border-gray-200 rounded-lg p-4">
@@ -84,7 +95,7 @@ const BudgetOverview = () => {
           <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden mb-1">
             <div
               className="bg-gray-700 h-full rounded-full"
-              style={{ width: `₹{spentPercentage}%` }}
+              style={{ width: `${spentPercentage}%` }}
             ></div>
           </div>
           <div className="flex justify-between text-sm text-gray-600">
@@ -101,7 +112,7 @@ const BudgetOverview = () => {
           <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden mb-1">
             <div
               className="bg-gray-600 h-full rounded-full"
-              style={{ width: `₹{dailyProgressPercentage}%` }}
+              style={{ width: `${dailyProgressPercentage}%` }}
             ></div>
           </div>
           <div className="flex justify-between text-sm text-gray-600">
@@ -120,7 +131,7 @@ const BudgetOverview = () => {
           <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden mb-1">
             <div
               className="bg-gray-500 h-full rounded-full"
-              style={{ width: `₹{savedPercentage}%` }}
+              style={{ width: `${savedPercentage}%` }}
             ></div>
           </div>
           <div className="flex justify-between text-sm text-gray-600">

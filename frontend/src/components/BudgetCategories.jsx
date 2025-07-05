@@ -19,7 +19,7 @@ const iconMap = {
 };
 
 const BudgetCategoryItem = ({ icon, name, spent, total, colorClass, bgColorClass }) => {
-  const percentage = total > 0 ? (spent / total) * 100 : 100; // If no budget, show full bar
+  const percentage = total > 0 ? (spent / total) * 100 : 100;
 
   return (
     <div className="flex items-center py-4 border-b border-gray-200 last:border-b-0">
@@ -47,7 +47,7 @@ const BudgetCategoryItem = ({ icon, name, spent, total, colorClass, bgColorClass
   );
 };
 
-const BudgetCategories = () => {
+const BudgetCategories = ({ selectedMonth, selectedYear }) => {
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
@@ -57,14 +57,10 @@ const BudgetCategories = () => {
 
         const [budgetsRes, transactionsRes] = await Promise.all([
           fetch('http://localhost:4000/api/budgets', {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            headers: { Authorization: `Bearer ${token}` },
           }),
           fetch('http://localhost:4000/api/transactions', {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
 
@@ -74,27 +70,34 @@ const BudgetCategories = () => {
 
         const budgets = await budgetsRes.json();
         const transactions = await transactionsRes.json();
-        console.log('Transactions:', transactions);
+
+        const filteredTransactions = transactions.filter((tx) => {
+          const txDate = new Date(tx.date);
+          return (
+            txDate.getFullYear() === selectedYear &&
+            txDate.getMonth() === selectedMonth &&
+            tx.type?.toLowerCase() === 'expense'
+          );
+        });
 
         const spentMap = {};
-        transactions.forEach((tx) => {
+        filteredTransactions.forEach((tx) => {
           const txCategory = tx.category?.trim().toLowerCase();
-          if (tx.type?.toLowerCase() === 'expense') {
-            spentMap[txCategory] = (spentMap[txCategory] || 0) + Math.abs(tx.amount);
-          }
+          spentMap[txCategory] = (spentMap[txCategory] || 0) + Math.abs(tx.amount);
+        });
+
+        const filteredBudgets = budgets.filter((budget) => {
+          const bDate = new Date(budget.startDate || budget.createdAt);
+          return bDate.getFullYear() === selectedYear && bDate.getMonth() === selectedMonth;
         });
 
         const budgetMap = {};
-        budgets.forEach((budget) => {
+        filteredBudgets.forEach((budget) => {
           const cat = budget.category?.trim().toLowerCase();
           budgetMap[cat] = budget.amount;
         });
 
-        const allCategories = Array.from(new Set([...Object.keys(spentMap), ...Object.keys(budgetMap)]));
-
         const colors = ['bg-gray-800', 'bg-gray-700', 'bg-gray-600', 'bg-gray-500', 'bg-gray-400', 'bg-gray-300'];
-        console.log('Spent Map:', spentMap);
-        console.log('Budget Map:', budgetMap);
 
         const formatted = Object.entries(budgetMap).map(([catKey, amount], index) => {
           const originalKey = Object.keys(iconMap).find(
@@ -103,7 +106,7 @@ const BudgetCategories = () => {
 
           return {
             icon: iconMap[originalKey] || <FaLock />,
-            name: originalKey.charAt(0).toUpperCase() + originalKey.slice(1), // Capitalized name
+            name: originalKey.charAt(0).toUpperCase() + originalKey.slice(1),
             spent: spentMap[catKey] || 0,
             total: amount,
             colorClass: colors[index % colors.length],
@@ -118,7 +121,7 @@ const BudgetCategories = () => {
     };
 
     fetchBudgetsAndTransactions();
-  }, []);
+  }, [selectedMonth, selectedYear]);
 
   return (
     <div className="bg-white rounded-lg p-5 shadow-md border border-gray-200">

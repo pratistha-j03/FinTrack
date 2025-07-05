@@ -27,8 +27,7 @@ const BudgetForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
     amount: '',
     period: 'Monthly',
     startDate: '',
-    rollOver: false,
-    alertEnabled: true,
+    endDate: '',
   });
 
   useEffect(() => {
@@ -56,9 +55,7 @@ const BudgetForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
       amount: parseFloat(formData.amount),
       period: formData.period,
       startDate: formData.startDate,
-      endDate: formData.endDate || new Date(new Date(formData.startDate).setMonth(new Date(formData.startDate).getMonth() + 1)).toISOString(),
-      rollOver: formData.rollOver,
-      alertEnabled: formData.alertEnabled,
+      endDate: formData.endDate,
     };
 
     try {
@@ -182,28 +179,16 @@ const BudgetForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
             />
           </div>
 
-          {/* Checkboxes */}
-          <div className="space-y-2">
-            <label className="inline-flex items-center">
-              <input
-                type="checkbox"
-                name="rollOver"
-                checked={formData.rollOver}
-                onChange={handleChange}
-                className="mr-2"
-              />
-              Roll over remaining amount to next period
-            </label>
-            <label className="inline-flex items-center">
-              <input
-                type="checkbox"
-                name="alertEnabled"
-                checked={formData.alertEnabled}
-                onChange={handleChange}
-                className="mr-2"
-              />
-              Enable alerts when nearing budget limit
-            </label>
+          {/* End Date */}
+          <div>
+            <label className="block text-sm font-medium mb-1">End Date</label>
+            <input
+              type="date"
+              name="endDate"
+              value={formData.endDate}
+              onChange={handleChange}
+              className="w-full border rounded px-3 py-2"
+            />
           </div>
 
           {/* Buttons */}

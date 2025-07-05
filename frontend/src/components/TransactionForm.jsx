@@ -5,11 +5,12 @@ const TransactionFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
     const [amount, setAmount] = useState(initialData?.amount || '');
     const [category, setCategory] = useState(initialData?.category || '');
     const [type, setType] = useState(initialData?.type || 'Expense');
+    const [date, setDate] = useState(initialData?.data ? new Date(initialData.date).toISOString().slice(0, 16) : new Date().toISOString().slice(0, 16));
 
     const handleSubmit = (e) => {
         e.preventDefault();
         const newAmount = type === 'Expense' ? -Math.abs(parseFloat(amount)) : Math.abs(parseFloat(amount));
-        onSubmit({ ...initialData, description, amount: newAmount, category, type });
+        onSubmit({ ...initialData, description, amount: newAmount, category, type, date: new Date(date) });
     };
 
     if (!isOpen) return null;
@@ -64,6 +65,18 @@ const TransactionFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
                             <option value="Income">Income</option>
                         </select>
                     </div>
+                    <div className="mb-4">
+                        <label htmlFor="date" className="block text-gray-700 text-sm font-bold mb-2">Date & Time</label>
+                        <input
+                            type="datetime-local"
+                            id="date"
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            value={date}
+                            onChange={(e) => setDate(e.target.value)}
+                            required
+                        />
+                    </div>
+
                     <div className="flex justify-end gap-2">
                         <button
                             type="button"

@@ -22,7 +22,15 @@ const BudgetSchema = new mongoose.Schema({
         type: Date,
         required: true
     },
-    
+    month: {
+        type: Number,
+        required: true
+    },
+    year: {
+        type: Number,
+        required: true
+    }
+
 
 });
 

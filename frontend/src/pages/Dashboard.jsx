@@ -7,6 +7,7 @@ import { Search, Bell, ChevronDown, Plus, DollarSign, ArrowDown, ArrowUp, PiggyB
 import Sidebar from '../components/Sidebar'; 
 import DashboardCards from '../components/DashboardCards'; 
 import Header from '../components/Header'; 
+import TransactionPieChart from '../components/TransactionPieChart'; // Assuming this is the component for the pie chart
 
 const incomeExpensesData = [
   { name: 'Jan', Income: 4000, Expenses: 2400 },
@@ -18,18 +19,9 @@ const incomeExpensesData = [
   { name: 'Jul', Income: 3490, Expenses: 4300 },
 ];
 
-const spendingData = [
-  { name: 'Housing', value: 30, color: '#4A5568' },       
-  { name: 'Food', value: 20, color: '#718096' },          
-  { name: 'Transportation', value: 15, color: '#A0AEC0' }, 
-  { name: 'Entertainment', value: 10, color: '#CBD5E0' }, 
-  { name: 'Other', value: 25, color: '#E2E8F0' },        
-];
-
-const COLORS = spendingData.map(d => d.color); 
-
 const Dashboard = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('Month');
+  const [spendingData, setSpendingData] = useState([]);
 
   return (
     <div className="flex min-h-screen bg-gray-100 font-sans">
@@ -105,35 +97,7 @@ const Dashboard = () => {
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col sm:flex-row items-center justify-center">
-                <ResponsiveContainer width="100%" height={250}>
-                  <PieChart>
-                    <Pie
-                      data={spendingData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      paddingAngle={5}
-                      dataKey="value"
-                    >
-                      {spendingData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="sm:ml-8 mt-4 sm:mt-0">
-                  {spendingData.map((entry, index) => (
-                    <p key={`legend-${index}`} className="flex items-center text-sm text-gray-700 mb-1">
-                      <span className="inline-block w-3 h-3 rounded-full mr-2" style={{ backgroundColor: entry.color }}></span>
-                      {entry.name} ({entry.value} %)
-                    </p>
-                  ))}
-                </div>
-              </div>
+              <TransactionPieChart spendingData={spendingData} />
             </div>
           </div>
       

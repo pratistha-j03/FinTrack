@@ -2,7 +2,7 @@ const Transaction = require('../models/transactionModel');
 const User = require('../models/userModel');
 
 const addTransaction = async (req, res) => {
-  const { description, amount, category, type } = req.body;
+  const { description, amount, category, type, date } = req.body;
 
   if (!description || !amount || !category || !type) {
     return res.status(400).json({ message: 'All fields are required' });
@@ -15,7 +15,7 @@ const addTransaction = async (req, res) => {
       amount,
       category,
       type,
-      date: new Date()
+      date : date || new Date(date),
     });
 
     await User.findByIdAndUpdate(

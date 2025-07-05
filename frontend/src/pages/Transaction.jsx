@@ -228,7 +228,7 @@ const App = () => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {paginatedTransactions.map((transaction) => (
                   <tr key={transaction._id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.date}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(transaction.date).toLocaleString()}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{transaction.description}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
