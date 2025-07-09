@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Bell, ChevronDown, UserCircle } from 'lucide-react';
-
+import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 
 function App() {
-
+  const navigate = useNavigate();
   const [firstName, setFirstName] = useState(' ');
   const [lastName, setLastName] = useState(' ');
   const [email, setEmail] = useState(' ');
@@ -77,10 +77,38 @@ function App() {
 
   };
 
-  const handleDeleteAccount = () => {
-    console.log('Deleting account...');
+  const handleDeleteAccount = async () => {
+    const confirmDelete = window.confirm('Are you sure you want to delete your account? This action cannot be undone.');
+      if (!confirmDelete) return;
 
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch('http://localhost:4000/api/users/delete', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.message || 'Failed to delete account');
+    }
+
+    localStorage.removeItem('token');
+    alert('Account deleted successfully.');
+    navigate('/login');
+  } catch (error) {
+    console.error('Error deleting account:', error.message);
+    alert(`Error: ${error.message}`);
+  }
   };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token'); 
+    navigate('/login');
+  }
 
   return (
     <div className="flex h-screen bg-gray-100 font-sans">
@@ -208,6 +236,12 @@ function App() {
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors duration-200 text-gray-800 font-medium"
                   >
                     Change Password
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors duration-200 text-gray-800 font-medium"
+                  >
+                    Logout
                   </button>
                   <button
                     onClick={handleDeleteAccount}

@@ -22,7 +22,7 @@ const twColorClasses = [
   'bg-gray-200',
 ];
 
-const BudgetDistribution = ({month, year}) => {
+const BudgetDistribution = ({ selectedMonth, selectedYear }) => {
   const [budgetData, setBudgetData] = useState([]);
 
   useEffect(() => {
@@ -36,15 +36,16 @@ const BudgetDistribution = ({month, year}) => {
         });
 
         const data = await res.json();
-          const filtered = data.filter((budget) => {
-          const start = new Date(budget.startDate);
-          const end = new Date(budget.endDate);
-          return start.getMonth() <= month &&
-                 end.getMonth() >= month &&
-                 start.getFullYear() <= year &&
-                 end.getFullYear() >= year;
+
+        // Filter by selectedMonth and selectedYear
+        const filtered = data.filter(budget => {
+          const bDate = new Date(budget.startDate || budget.createdAt);
+          return (
+            bDate.getFullYear() === selectedYear &&
+            bDate.getMonth() === selectedMonth
+          );
         });
-        
+
         setBudgetData(filtered);
       } catch (error) {
         console.error('Error fetching budgets:', error);
@@ -52,7 +53,8 @@ const BudgetDistribution = ({month, year}) => {
     };
 
     fetchBudgets();
-  }, [month, year]);
+  }, [selectedMonth, selectedYear]);
+
 
   const totalBudget = budgetData.reduce((acc, b) => acc + b.amount, 0);
 

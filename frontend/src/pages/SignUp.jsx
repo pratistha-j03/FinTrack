@@ -34,7 +34,7 @@ function SignUp() {
         console.log("User created:", data);
         navigate('/Login');
       } else {
-        alert("Signup failed");
+        alert("Signup failed", data.message );
       }
     } catch (err) {
       console.error("Signup error:", err.message);

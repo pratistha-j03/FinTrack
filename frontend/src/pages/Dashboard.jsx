@@ -1,27 +1,86 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   PieChart, Pie, Cell
 } from 'recharts';
-import { Search, Bell, ChevronDown, Plus, DollarSign, ArrowDown, ArrowUp, PiggyBank, Mail, Lock, UserCircle } from 'lucide-react'; 
-import Sidebar from '../components/Sidebar'; 
-import DashboardCards from '../components/DashboardCards'; 
-import Header from '../components/Header'; 
+import { Search, Bell, ChevronDown, Plus, DollarSign, ArrowDown, ArrowUp, PiggyBank, Mail, Lock, UserCircle } from 'lucide-react';
+import Sidebar from '../components/Sidebar';
+import DashboardCards from '../components/DashboardCards';
+import Header from '../components/Header';
 import TransactionPieChart from '../components/TransactionPieChart'; // Assuming this is the component for the pie chart
+import ScrollingBanner from '../components/ScrollingBanner';
 
-const incomeExpensesData = [
-  { name: 'Jan', Income: 4000, Expenses: 2400 },
-  { name: 'Feb', Income: 3000, Expenses: 1398 },
-  { name: 'Mar', Income: 2000, Expenses: 9800 },
-  { name: 'Apr', Income: 2780, Expenses: 3908 },
-  { name: 'May', Income: 1890, Expenses: 4800 },
-  { name: 'Jun', Income: 2390, Expenses: 3800 },
-  { name: 'Jul', Income: 3490, Expenses: 4300 },
-];
+// const incomeExpensesData = [
+//   { name: 'Jan', Income: 4000, Expenses: 2400 },
+//   { name: 'Feb', Income: 3000, Expenses: 1398 },
+//   { name: 'Mar', Income: 2000, Expenses: 9800 },
+//   { name: 'Apr', Income: 2780, Expenses: 3908 },
+//   { name: 'May', Income: 1890, Expenses: 4800 },
+//   { name: 'Jun', Income: 2390, Expenses: 3800 },
+//   { name: 'Jul', Income: 3490, Expenses: 4300 },
+// ];
 
 const Dashboard = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('Month');
-  const [spendingData, setSpendingData] = useState([]);
+  const [incomeExpensesData, setIncomeExpensesData] = useState([]);
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+
+  useEffect(() => {
+  const fetchTransactions = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch('http://localhost:4000/api/transactions', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error('Failed to fetch transactions');
+
+      const transactions = await res.json();
+
+      const now = new Date();
+      const lastSixMonths = Array.from({ length: 6 }).map((_, idx) => {
+        const d = new Date(now.getFullYear(), now.getMonth() - (5 - idx), 1);
+        return {
+          month: d.getMonth(), // 0-indexed
+          year: d.getFullYear(),
+          label: d.toLocaleString('default', { month: 'short', year: 'numeric' }), // e.g. Jul 2025
+        };
+      });
+
+      const groupedData = lastSixMonths.map(({ month, year, label }) => {
+        const monthTransactions = transactions.filter((tx) => {
+          const date = new Date(tx.date);
+          return date.getMonth() === month && date.getFullYear() === year;
+        });
+
+        const income = monthTransactions
+          .filter((tx) => tx.amount > 0)
+          .reduce((sum, tx) => sum + tx.amount, 0);
+
+        const expenses = monthTransactions
+          .filter((tx) => tx.amount < 0)
+          .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
+
+        return {
+          name: label, // for X-axis
+          Income: income,
+          Expenses: expenses,
+        };
+      });
+
+      console.log("Final Chart Data:", groupedData);
+      setIncomeExpensesData(groupedData);
+    } catch (err) {
+      console.error('Error fetching transactions:', err.message);
+    }
+  };
+
+  fetchTransactions();
+}, []);
+
 
   return (
     <div className="flex min-h-screen bg-gray-100 font-sans">
@@ -33,35 +92,30 @@ const Dashboard = () => {
         <main className="flex-1 overflow-auto p-6">
           <div className="flex justify-between items-center">
             <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
-            {/* <button className="flex items-center px-4 py-2 bg-black text-white rounded-lg shadow-md hover:bg-gray-800 transition-colors duration-200">
-                <Plus className="mr-2" size={16} />
-                Add Transaction
-            </button> */}
+            <div className="mb-4">
+              <label className="text-sm text-gray-600 mr-2">Select Month:</label>
+              <input
+                type="month"
+                className="border border-gray-300 rounded px-2 py-1 text-sm"
+                value={`${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}`}
+                onChange={(e) => {
+                  const [year, month] = e.target.value.split('-').map(Number);
+                  setSelectedYear(year);
+                  setSelectedMonth(month - 1); // JS months are 0-indexed
+                }}
+              />
+            </div>
           </div>
 
-          <DashboardCards /> 
+          <DashboardCards selectedMonth={selectedMonth} selectedYear={selectedYear} />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-       
+
             <div className="bg-white p-6 rounded-xl shadow-md">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold text-gray-800">Income vs Expenses</h3>
-                <div className="flex space-x-1 bg-gray-100 rounded-lg p-1">
-                  {['Week', 'Month', 'Year'].map((period) => (
-                    <button
-                      key={period}
-                      className={`px-3 py-1 rounded-md text-xs font-medium transition-all duration-200 ${
-                        selectedPeriod === period
-                          ? 'bg-black text-white shadow-sm'
-                          : 'text-gray-700 hover:bg-gray-200'
-                      }`}
-                      onClick={() => setSelectedPeriod(period)}
-                    >
-                      {period}
-                    </button>
-                  ))}
-                </div>
               </div>
+
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart
                   data={incomeExpensesData}
@@ -84,23 +138,14 @@ const Dashboard = () => {
             <div className="bg-white p-6 rounded-xl shadow-md">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold text-gray-800">Spending by Category</h3>
-                <div className="relative">
-                  <select
-                    className="appearance-none bg-gray-100 border border-gray-300 text-gray-700 py-1 pl-3 pr-8 rounded-lg leading-tight focus:outline-none focus:bg-white focus:border-blue-500 text-sm"
-                  >
-                    <option>This Month</option>
-                    <option>Last Month</option>
-                    <option>This Year</option>
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                    <ChevronDown size={16} />
-                  </div>
-                </div>
+                
               </div>
-              <TransactionPieChart spendingData={spendingData} />
+              <TransactionPieChart selectedMonth={selectedMonth} selectedYear={selectedYear} />
             </div>
-          </div>
-      
+          </div><br/><br/>
+
+          
+          <ScrollingBanner />
         </main>
       </div>
     </div>

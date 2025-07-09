@@ -3,7 +3,7 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 
 const COLORS = ['#000000', '#3d3d3d', '#5a5a5a', '#777777', '#999999', '#bfbfbf'];
 
-const SpendingPieChart = () => {
+const SpendingPieChart = ({selectedMonth, selectedYear}) => {
   const [spendingData, setSpendingData] = useState([]);
 
   useEffect(() => {
@@ -17,22 +17,23 @@ const SpendingPieChart = () => {
         });
 
         if (!res.ok) throw new Error('Failed to fetch transactions');
-
         const transactions = await res.json();
+
+        const filtered = transactions.filter((tx) => {
+          const date = new Date(tx.date);
+          return (
+            date.getMonth() === selectedMonth &&
+            date.getFullYear() === selectedYear &&
+            tx.type.toLowerCase() === 'expense'
+          );
+        });
 
         const expenseByCategory = {};
 
-        transactions.forEach(tx => {
-          if (tx.type.toLowerCase() === 'expense') {
+        filtered.forEach(tx => {
             const category = tx.category || 'Others';
-            const amount = Math.abs(tx.amount); // Ensure positive value
-
-            if (!expenseByCategory[category]) {
-              expenseByCategory[category] = 0;
-            }
-
-            expenseByCategory[category] += amount;
-          }
+            const amount = Math.abs(tx.amount);   
+            expenseByCategory[category] = (expenseByCategory[category] || 0) + amount;
         });
 
         const totalSpent = Object.values(expenseByCategory).reduce((sum, val) => sum + val, 0);
@@ -51,7 +52,7 @@ const SpendingPieChart = () => {
     };
 
     fetchTransactions();
-  }, []);
+  }, [selectedMonth, selectedYear]);
 
   return (
     <div className="flex flex-col sm:flex-row items-center justify-center">
@@ -61,8 +62,8 @@ const SpendingPieChart = () => {
             data={spendingData}
             cx="50%"
             cy="50%"
-            innerRadius={60}
-            outerRadius={80}
+            innerRadius={80}
+            outerRadius={100}
             paddingAngle={5}
             dataKey="value"
           >

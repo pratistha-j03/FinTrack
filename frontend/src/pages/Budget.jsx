@@ -13,12 +13,12 @@ const BudgetPage = () => {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
-  const handleMonthChange = (e) => {
-    setSelectedMonth(Number(e.target.value));
-  };
-  const handleYearChange = (e) => {
-    setSelectedYear(Number(e.target.value));
-  };
+  // const handleMonthChange = (e) => {
+  //   setSelectedMonth(Number(e.target.value));
+  // };
+  // const handleYearChange = (e) => {
+  //   setSelectedYear(Number(e.target.value));
+  // };
   return (
     <div className="flex h-screen bg-gray-100">
       <Sidebar />
@@ -69,7 +69,7 @@ const BudgetPage = () => {
               <BudgetCategories selectedMonth={selectedMonth} selectedYear={selectedYear} />
             </div>
             <div className="md:w-1/3">
-              <BudgetDistribution month={selectedMonth} year={selectedYear} />
+              <BudgetDistribution selectedMonth={selectedMonth} selectedYear={selectedYear} />
             </div>
           </div>
         </main>

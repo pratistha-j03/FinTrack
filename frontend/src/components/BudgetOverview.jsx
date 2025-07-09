@@ -64,12 +64,8 @@ const BudgetOverview = ({ month, year }) => {
   const dailyTarget = totalDays > 0 ? (totalBudget / totalDays).toFixed(2) : 0;
   const dailyProgressPercentage = (dailyAverage / dailyTarget) * 100;
 
-  const savingsGoal = 1000;
-  const saved = 450;
-  const toGo = savingsGoal - saved;
-
   const spentPercentage = (spent / totalBudget) * 100;
-  const savedPercentage = (saved / savingsGoal) * 100;
+  // const savedPercentage = (saved / savingsGoal) * 100;
 
   return (
     <div className="bg-white rounded-lg p-5 shadow-md border border-gray-200">
@@ -123,22 +119,7 @@ const BudgetOverview = ({ month, year }) => {
           </div>
         </div>
 
-        <div className="border border-gray-200 rounded-lg p-4">
-          <h3 className="text-base font-medium text-gray-700 mb-2">Savings Goal</h3>
-          <div className="flex justify-between items-baseline mb-1">
-            <span className="text-3xl font-bold text-gray-900">₹{savingsGoal.toLocaleString()}</span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden mb-1">
-            <div
-              className="bg-gray-500 h-full rounded-full"
-              style={{ width: `${savedPercentage}%` }}
-            ></div>
-          </div>
-          <div className="flex justify-between text-sm text-gray-600">
-            <span>₹{saved.toLocaleString()} saved</span>
-            <span>₹{toGo.toLocaleString()} to go</span>
-          </div>
-        </div>
+        
       </div>
     </div>
   );
