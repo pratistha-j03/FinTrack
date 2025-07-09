@@ -9,7 +9,6 @@ It's designed to give clear insights into financial activity using clean dashboa
 
 ### 🔐 Authentication
 - Secure login and signup
-- Firebase Email/Password authentication (Google/GitHub coming soon)
 
 ### 💰 Transactions
 - Add income or expense entries
