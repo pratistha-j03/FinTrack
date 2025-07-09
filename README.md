@@ -37,5 +37,5 @@ It's designed to give clear insights into financial activity using clean dashboa
 
 | Frontend       | Backend       | Database  | Auth      |
 |----------------|----------------|------------|-----------|
-| React + Vite   | Node.js + Express | MongoDB Atlas | Firebase |
+| React + Vite   | Node.js + Express | MongoDB Atlas | JWT & bcrypt |
 
