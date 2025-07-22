@@ -20,8 +20,8 @@ app.get('/', (req, res) => {
   res.send('API is running...');
 });
 
-app.get('/about', (req, res) => {
-  res.send('About Page');
+app.get('/api/budgets', (req, res) => {
+  res.send('Working on budgets API');
 }); 
 
 const PORT = process.env.PORT || 8000;

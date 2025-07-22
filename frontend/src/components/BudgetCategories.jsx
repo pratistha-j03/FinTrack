@@ -7,18 +7,19 @@ import {
   FaLock,
   FaHeart,
 } from 'react-icons/fa';
+import { FiTrash2 } from 'react-icons/fi';
 
 // Icon mapping
 const iconMap = {
   Home: <FaHome />,
   Food: <FaUtensils />,
   Transport: <FaCar />,
-  Bills: <FaFileInvoice />,
+  Stationary: <FaFileInvoice />,
   Lock: <FaLock />,
   Entertainment: <FaHeart />,
 };
 
-const BudgetCategoryItem = ({ icon, name, spent, total, colorClass, bgColorClass }) => {
+const BudgetCategoryItem = ({ icon, name, spent, total, colorClass, bgColorClass, onDelete }) => {
   const percentage = total > 0 ? (spent / total) * 100 : 100;
 
   return (
@@ -43,12 +44,45 @@ const BudgetCategoryItem = ({ icon, name, spent, total, colorClass, bgColorClass
           {total > 0 ? `${Math.round(percentage)}% of budget` : 'No budget set'}
         </div>
       </div>
+      <button
+        onClick={onDelete}
+        className="ml-4 text-red-500 hover:text-red-700"
+        title="Delete Budget"
+      >
+        <FiTrash2 />
+      </button>
     </div>
   );
 };
 
 const BudgetCategories = ({ selectedMonth, selectedYear }) => {
   const [categories, setCategories] = useState([]);
+
+
+
+  const handleDelete = async (id) => {
+    const token = localStorage.getItem('token');
+    if (!id) return;
+    const confirmDelete = window.confirm("Are you sure you want to delete this budget?");
+    if (!confirmDelete) return;
+
+    try {
+      const res = await fetch(`http://localhost:4000/api/budgets/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || 'Failed to delete');
+      }
+
+    } catch (err) {
+      alert("Error deleting budget: " + err.message);
+    }
+  };
 
   useEffect(() => {
     const fetchBudgetsAndTransactions = async () => {
@@ -104,6 +138,8 @@ const BudgetCategories = ({ selectedMonth, selectedYear }) => {
             (iconKey) => iconKey.toLowerCase() === catKey
           ) || catKey;
 
+          const matchingBudget = filteredBudgets.find(b => b.category?.toLowerCase() === catKey);
+
           return {
             icon: iconMap[originalKey] || <FaLock />,
             name: originalKey.charAt(0).toUpperCase() + originalKey.slice(1),
@@ -111,6 +147,7 @@ const BudgetCategories = ({ selectedMonth, selectedYear }) => {
             total: amount,
             colorClass: colors[index % colors.length],
             bgColorClass: 'bg-gray-100',
+            id: matchingBudget ? matchingBudget._id.toString() : null,
           };
         });
 
@@ -132,7 +169,8 @@ const BudgetCategories = ({ selectedMonth, selectedYear }) => {
       <div>
         {categories.length > 0 ? (
           categories.map((category, index) => (
-            <BudgetCategoryItem key={index} {...category} />
+            <BudgetCategoryItem key={index} {...category} onDelete = {
+            ()=> handleDelete(category.id)}/>
           ))
         ) : (
           <p className="text-gray-500 text-sm">No categories found.</p>

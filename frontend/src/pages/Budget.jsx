@@ -28,26 +28,7 @@ const BudgetPage = () => {
           <button onClick={() => setShowAddBudgetModal(true)} className="bg-black text-white font-bold py-2 px-4 rounded-lg mb-5 position-relative left-0 ">
             Add Budget
           </button>
-          {/* <div className="flex items-center gap-4 mb-5">
-            <select
-              value={selectedMonth}
-              onChange={handleMonthChange}
-              className="border border-gray-300 rounded px-2 py-1"
-            >
-              {Array.from({ length: 12 }, (_, i) => (
-                <option key={i} value={i}>{new Date(0, i).toLocaleString('default', { month: 'long' })}</option>
-              ))}
-            </select>
-            <select
-              value={selectedYear}
-              onChange={handleYearChange}
-              className="border border-gray-300 rounded px-2 py-1"
-            >
-              {[2024, 2025, 2026].map((year) => (
-                <option key={year} value={year}>{year}</option>
-              ))}
-            </select>
-          </div> */}
+          
           <div className="mb-4">
             <label className="text-sm text-gray-600 mr-2">Select Month:</label>
             <input
@@ -76,7 +57,7 @@ const BudgetPage = () => {
         <BudgetForm
           isOpen={showAddBudgetModal}
           onClose={() => setShowAddBudgetModal(false)}
-        // onSubmit={handleAddBudget}
+        // onSubmit={handleSubmit}
         // initialData={null}
         />
 

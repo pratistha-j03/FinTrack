@@ -67,7 +67,7 @@ const BudgetForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
         },
         body: JSON.stringify(payload),
       });
-
+      console.log('Response Status:', res.status);
       if (!res.ok) throw new Error('Failed to create budget');
 
       const data = await res.json();
