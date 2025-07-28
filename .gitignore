@@ -8,6 +8,7 @@ build/
 
 # Environment
 backend/.env
+frontend/.env
 
 # Logs
 *.log
