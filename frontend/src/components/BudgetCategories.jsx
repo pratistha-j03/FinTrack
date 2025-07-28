@@ -67,7 +67,7 @@ const BudgetCategories = ({ selectedMonth, selectedYear }) => {
     if (!confirmDelete) return;
 
     try {
-      const res = await fetch(`http://localhost:4000/api/budgets/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/budgets/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -90,10 +90,10 @@ const BudgetCategories = ({ selectedMonth, selectedYear }) => {
         const token = localStorage.getItem('token');
 
         const [budgetsRes, transactionsRes] = await Promise.all([
-          fetch('http://localhost:4000/api/budgets', {
+          fetch(`${import.meta.env.VITE_API_URL}/api/budgets`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          fetch('http://localhost:4000/api/transactions', {
+          fetch(`${import.meta.env.VITE_API_URL}/api/transactions`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);

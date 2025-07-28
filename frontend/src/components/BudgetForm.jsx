@@ -59,7 +59,7 @@ const BudgetForm = ({ isOpen, onClose, onSubmit, initialData = null }) => {
     };
 
     try {
-      const res = await fetch('http://localhost:4000/api/budgets', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/budgets`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

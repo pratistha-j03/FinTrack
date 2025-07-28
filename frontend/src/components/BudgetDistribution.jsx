@@ -29,7 +29,7 @@ const BudgetDistribution = ({ selectedMonth, selectedYear }) => {
     const fetchBudgets = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch('http://localhost:4000/api/budgets', {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/budgets`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

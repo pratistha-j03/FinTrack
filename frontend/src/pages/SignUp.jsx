@@ -14,7 +14,7 @@ function SignUp() {
     e.preventDefault();
     console.log('Signing up with:', { firstName, lastName, phone, email, password });
      try {
-      const res = await fetch("http://localhost:4000/api/users/register", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/users/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

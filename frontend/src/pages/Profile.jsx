@@ -19,7 +19,7 @@ function App() {
       const token = localStorage.getItem('token');
 
       try {
-        const res = await fetch('http://localhost:4000/api/users/profile', {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/users/profile`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -46,7 +46,7 @@ function App() {
     const token = localStorage.getItem('token');
 
     try {
-      const res = await fetch('http://localhost:4000/api/users/profile', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/users/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -83,7 +83,7 @@ function App() {
 
   try {
     const token = localStorage.getItem('token');
-    const res = await fetch('http://localhost:4000/api/users/delete', {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/users/delete`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',

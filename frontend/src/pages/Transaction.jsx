@@ -20,7 +20,7 @@ const App = () => {
   const fetchTransactions = async () => {
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch('http://localhost:4000/api/transactions', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/transactions`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -73,7 +73,7 @@ const App = () => {
     // setShowAddTransactionModal(false);
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch('http://localhost:4000/api/transactions', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/transactions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -93,7 +93,7 @@ const App = () => {
     const token = localStorage.getItem('token');
 
     try {
-      const res = await fetch(`http://localhost:4000/api/transactions/${updatedTransaction._id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/transactions/${updatedTransaction._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -125,7 +125,7 @@ const App = () => {
     const token = localStorage.getItem('token');
 
     try {
-      const res = await fetch(`http://localhost:4000/api/transactions/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/transactions/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,

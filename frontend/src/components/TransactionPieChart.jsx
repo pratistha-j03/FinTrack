@@ -10,7 +10,7 @@ const SpendingPieChart = ({selectedMonth, selectedYear}) => {
     const fetchTransactions = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch('http://localhost:4000/api/transactions', {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/transactions`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

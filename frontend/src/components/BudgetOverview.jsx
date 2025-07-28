@@ -10,12 +10,12 @@ const BudgetOverview = ({ month, year }) => {
         const token = localStorage.getItem('token');
 
         const [budgetRes, transactionRes] = await Promise.all([
-          fetch('http://localhost:4000/api/budgets', {
+          fetch(`${import.meta.env.VITE_API_URL}/api/budgets`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           }),
-          fetch('http://localhost:4000/api/transactions', {
+          fetch(`${import.meta.env.VITE_API_URL}/api/transactions`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
