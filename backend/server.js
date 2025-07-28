@@ -10,9 +10,21 @@ const budgetRoutes = require('./routes/budgetRoutes');
 connectDB();
 const app = express();
 app.use(express.json());
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://fin-track-two-beta.vercel.app", 
+];
+
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://fin-track-two-beta.vercel.app'],
-  credentials: true
+  origin: function (origin, callback) {
+ 
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error("Not allowed by CORS"));
+  },
+  credentials: true,
 }));
 
 app.use('/api/users', userRoutes);

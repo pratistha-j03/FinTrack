@@ -38,7 +38,7 @@ const BudgetPage = () => {
               onChange={(e) => {
                 const [year, month] = e.target.value.split('-').map(Number);
                 setSelectedYear(year);
-                setSelectedMonth(month - 1); // JS months are 0-indexed
+                setSelectedMonth(month - 1); 
               }}
             />
           </div>
