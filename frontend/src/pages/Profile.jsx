@@ -23,11 +23,9 @@ function App() {
           headers: {
             Authorization: `Bearer ${token}`
           },
-          credentials: "include",
         });
 
         const data = await res.json();
-        console.log('Profile data:', data);
 
         setFirstName(data.firstName || ' ');
         setLastName(data.lastName || ' ');
@@ -53,7 +51,6 @@ function App() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
-        credentials: "include",
         body: JSON.stringify({
           firstName,
           lastName,
@@ -91,7 +88,6 @@ function App() {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      credentials: "include",
     });
 
     if (!res.ok) {

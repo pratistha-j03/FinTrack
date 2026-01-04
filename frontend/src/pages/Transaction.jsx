@@ -24,7 +24,6 @@ const App = () => {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-        credentials: "include",
       });
       const data = await res.json();
       if (res.ok) {
@@ -80,7 +79,6 @@ const App = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
-        credentials: "include",
         body: JSON.stringify(newTransaction)
       });
       const data = await res.json();
@@ -101,7 +99,6 @@ const App = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        credentials: "include",
         body: JSON.stringify(updatedTransaction),
       });
 
@@ -133,7 +130,6 @@ const App = () => {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-        credentials: "include",
       });
 
       if (res.ok) {
