@@ -22,7 +22,8 @@ function App() {
         const res = await fetch(`${import.meta.env.VITE_API_URL}/api/users/profile`, {
           headers: {
             Authorization: `Bearer ${token}`
-          }
+          },
+          credentials: "include",
         });
 
         const data = await res.json();
@@ -52,6 +53,7 @@ function App() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
+        credentials: "include",
         body: JSON.stringify({
           firstName,
           lastName,
@@ -89,6 +91,7 @@ function App() {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
+      credentials: "include",
     });
 
     if (!res.ok) {
