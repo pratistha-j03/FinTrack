@@ -11,7 +11,6 @@ const generateToken = (userId) => {
 const register = async (req, res) => {
   try {
     const { firstName, lastName, email, password, phoneNumber } = req.body;
-    console.log("Register endpoint hit with data:", req.body);
 
     // Check DB connection
     if (!mongoose.connection.readyState) {
@@ -33,8 +32,6 @@ const register = async (req, res) => {
       phoneNumber
     });
 
-    console.log("User created:", user);
-
     res.status(201).json({
       _id: user._id,
       firstName: user.firstName,
@@ -43,7 +40,6 @@ const register = async (req, res) => {
     });
 
   } catch (err) {
-    console.error("Registration error:", err);
     if (err.code === 11000) {
       return res.status(400).json({ message: "Email or phone number already exists" });
     }
@@ -87,7 +83,6 @@ const getProfile = async (req, res) => {
   }); 
 
   } catch (err) {
-    console.error('Get profile error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };

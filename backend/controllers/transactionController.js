@@ -23,7 +23,6 @@ const addTransaction = async (req, res) => {
       { $push: { transactions: transaction._id } }
     );
 
-    console.log("Transaction created:", transaction);
     res.status(201).json(transaction);
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });

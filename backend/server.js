@@ -9,23 +9,23 @@ const budgetRoutes = require('./routes/budgetRoutes');
 
 connectDB();
 const app = express();
-app.use(express.json());
-
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://fin-track-two-beta.vercel.app", 
+  "https://fin-track-two-beta.vercel.app",
 ];
 
 app.use(cors({
   origin: function (origin, callback) {
  
     if (!origin || allowedOrigins.includes(origin)) {
-      return callback(null, true);
+      callback(null, true);
     }
-    return callback(new Error("Not allowed by CORS"));
+    else callback(new Error("Not allowed by CORS"));
   },
-  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
+app.use(express.json());
 
 app.use('/api/users', userRoutes);
 app.use('/api/transactions', transactionRoutes);
@@ -39,7 +39,7 @@ app.get('/api/budgets', (req, res) => {
   res.send('Working on budgets API');
 }); 
 
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 4000;
 console.log("About to start server...");
 app.listen(PORT, () => {
   console.log(`Server is running on port www.localhost:${PORT}`)

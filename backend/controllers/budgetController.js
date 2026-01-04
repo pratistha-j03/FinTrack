@@ -27,7 +27,6 @@ const createBudget = async (req, res) => {
             req.user._id, {
             $push: { budgets: budget._id }
         });
-        console.log('Budget created:', budget);
 
         res.status(201).json(budget);
     } catch (err) {
@@ -71,7 +70,6 @@ const updateBudget = async (req, res) => {
 // Delete a budget
 const deleteBudget = async (req, res) => {
     const { id } = req.params;
-    console.log("Deleting the budget reuqest for id: ", id);
 
     try {
         const budget = await Budget.findById(id);
@@ -80,10 +78,6 @@ const deleteBudget = async (req, res) => {
             console.log('Budget not found in database.')
             return res.status(404).json({ message: 'Budget not found' });
         }
-        console.log(' Found Budget:', budget);
-
-        console.log('Budget user:', budget.user);
-        console.log('Request user:', req.user._id);
 
         if (budget.user.toString() !== req.user._id.toString()) {
             return res.status(403).json({ message: "Unauthorized" });
