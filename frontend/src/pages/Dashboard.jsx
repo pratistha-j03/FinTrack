@@ -7,79 +7,43 @@ import { Search, Bell, ChevronDown, Plus, DollarSign, ArrowDown, ArrowUp, PiggyB
 import Sidebar from '../components/Sidebar';
 import DashboardCards from '../components/DashboardCards';
 import Header from '../components/Header';
-import TransactionPieChart from '../components/TransactionPieChart'; // Assuming this is the component for the pie chart
+import TransactionPieChart from '../components/TransactionPieChart';
 import ScrollingBanner from '../components/ScrollingBanner';
-
-// const incomeExpensesData = [
-//   { name: 'Jan', Income: 4000, Expenses: 2400 },
-//   { name: 'Feb', Income: 3000, Expenses: 1398 },
-//   { name: 'Mar', Income: 2000, Expenses: 9800 },
-//   { name: 'Apr', Income: 2780, Expenses: 3908 },
-//   { name: 'May', Income: 1890, Expenses: 4800 },
-//   { name: 'Jun', Income: 2390, Expenses: 3800 },
-//   { name: 'Jul', Income: 3490, Expenses: 4300 },
-// ];
+import SpendingComparison from '../components/SpendingComparison';
 
 const Dashboard = () => {
-  const [selectedPeriod, setSelectedPeriod] = useState('Month');
   const [incomeExpensesData, setIncomeExpensesData] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
   useEffect(() => {
-  const fetchTransactions = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/transactions`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!res.ok) throw new Error('Failed to fetch transactions');
-
-      const transactions = await res.json();
-
-      const now = new Date();
-      const lastSixMonths = Array.from({ length: 6 }).map((_, idx) => {
-        const d = new Date(now.getFullYear(), now.getMonth() - (5 - idx), 1);
-        return {
-          month: d.getMonth(), // 0-indexed
-          year: d.getFullYear(),
-          label: d.toLocaleString('default', { month: 'short', year: 'numeric' }), // e.g. Jul 2025
-        };
-      });
-
-      const groupedData = lastSixMonths.map(({ month, year, label }) => {
-        const monthTransactions = transactions.filter((tx) => {
-          const date = new Date(tx.date);
-          return date.getMonth() === month && date.getFullYear() === year;
+    const fetchTransactions = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/analytics/trends?months=6`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
 
-        const income = monthTransactions
-          .filter((tx) => tx.amount > 0)
-          .reduce((sum, tx) => sum + tx.amount, 0);
+        if (!res.ok) throw new Error('Failed to fetch transactions');
 
-        const expenses = monthTransactions
-          .filter((tx) => tx.amount < 0)
-          .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
+        const transactions = await res.json();
 
-        return {
-          name: label, // for X-axis
-          Income: income,
-          Expenses: expenses,
-        };
-      });
+        const formatted = transactions.map((d) => ({
+          name: d.label,
+          Income: d.income,
+          Expenses: d.expenses,
+        }));
 
-      console.log("Final Chart Data:", groupedData);
-      setIncomeExpensesData(groupedData);
-    } catch (err) {
-      console.error('Error fetching transactions:', err.message);
-    }
-  };
+        setIncomeExpensesData(formatted);
+      } catch (err) {
+        console.error('Error fetching transactions:', err.message);
+      }
+    };
 
-  fetchTransactions();
-}, []);
+    fetchTransactions();
+  }, []);
 
 
   return (
@@ -138,13 +102,16 @@ const Dashboard = () => {
             <div className="bg-white p-6 rounded-xl shadow-md">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold text-gray-800">Spending by Category</h3>
-                
+
               </div>
               <TransactionPieChart selectedMonth={selectedMonth} selectedYear={selectedYear} />
             </div>
-          </div><br/><br/>
+          </div>
 
-          
+          <div className="mt-6">
+            <SpendingComparison selectedMonth={selectedMonth} selectedYear={selectedYear} />
+          </div>
+          <br/>
           <ScrollingBanner />
         </main>
       </div>

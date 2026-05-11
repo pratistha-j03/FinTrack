@@ -3,56 +3,48 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 
 const COLORS = ['#000000', '#3d3d3d', '#5a5a5a', '#777777', '#999999', '#bfbfbf'];
 
-const SpendingPieChart = ({selectedMonth, selectedYear}) => {
+const SpendingPieChart = ({ selectedMonth, selectedYear }) => {
   const [spendingData, setSpendingData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchTransactions = async () => {
+      setLoading(true);
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/transactions`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/analytics/categories?month=${selectedMonth + 1
+          }&year=${selectedYear}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
 
-        if (!res.ok) throw new Error('Failed to fetch transactions');
-        const transactions = await res.json();
+        if (!res.ok) throw new Error('Failed to fetch categories');
+        const { categories } = await res.json();
 
-        const filtered = transactions.filter((tx) => {
-          const date = new Date(tx.date);
-          return (
-            date.getMonth() === selectedMonth &&
-            date.getFullYear() === selectedYear &&
-            tx.type.toLowerCase() === 'expense'
-          );
-        });
-
-        const expenseByCategory = {};
-
-        filtered.forEach(tx => {
-            const category = tx.category || 'Others';
-            const amount = Math.abs(tx.amount);   
-            expenseByCategory[category] = (expenseByCategory[category] || 0) + amount;
-        });
-
-        const totalSpent = Object.values(expenseByCategory).reduce((sum, val) => sum + val, 0);
-
-        const data = Object.entries(expenseByCategory).map(([name, value], index) => ({
-          name,
-          value,
+        const data = categories.map((c, index) => ({
+          name: c.category,
+          value: c.total,
           color: COLORS[index % COLORS.length],
-          percentage: ((value / totalSpent) * 100).toFixed(1),
+          percentage: c.percentage,
         }));
 
         setSpendingData(data);
       } catch (err) {
         console.error('Error fetching transactions:', err.message);
       }
+      finally {
+        setLoading(false);
+      }
     };
 
     fetchTransactions();
   }, [selectedMonth, selectedYear]);
+
+  if (loading) return <p className="text-sm text-gray-400 text-center py-8">Loading...</p>;
+  if (!spendingData.length)
+    return <p className="text-sm text-gray-400 text-center py-8">No expense data for this month.</p>;
 
   return (
     <div className="flex flex-col sm:flex-row items-center justify-center">
@@ -71,7 +63,7 @@ const SpendingPieChart = ({selectedMonth, selectedYear}) => {
               <Cell key={`cell-${index}`} fill={entry.color} />
             ))}
           </Pie>
-          <Tooltip />
+          <Tooltip formatter={(val) => `₹${val.toLocaleString()}`} />
         </PieChart>
       </ResponsiveContainer>
 
@@ -81,8 +73,8 @@ const SpendingPieChart = ({selectedMonth, selectedYear}) => {
             <span
               className="inline-block w-3 h-3 rounded-full mr-2"
               style={{ backgroundColor: entry.color }}
-            ></span>
-            {entry.name} (₹{entry.value.toLocaleString()} - {entry.percentage}%)
+            />
+            {entry.name} (₹{entry.value.toLocaleString()} — {entry.percentage}%)
           </p>
         ))}
       </div>
