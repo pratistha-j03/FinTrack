@@ -29,6 +29,14 @@
 
 ---
 
+## 📸 App Screenshots
+
+| Dashboard | Transactions |
+|---|---|
+| <img src="./frontend/public/img1.png" width="400"> | <img src="./frontend/public/img2.png" width="400"> | <img src="./frontend/public/img3.png" width="400"> | <img src="./frontend/public/img4.png" width="400">
+
+---
+
 ## 🛠️ Tech Stack
 
 | Category | Technology |
