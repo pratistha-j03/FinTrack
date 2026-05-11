@@ -99,7 +99,7 @@ function App() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
+          {/* <div className="flex items-center justify-between">
             <label className="flex items-center text-sm text-gray-900">
               <input type="checkbox" className="h-4 w-4 text-black border-gray-300 rounded mr-2" />
               Remember me
@@ -107,7 +107,7 @@ function App() {
             <a href="#" className="text-sm font-medium text-black hover:underline">
               Forgot your password?
             </a>
-          </div>
+          </div> */}
 
           <button
             type="submit" 

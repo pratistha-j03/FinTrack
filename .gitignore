@@ -10,5 +10,7 @@ build/
 backend/.env
 frontend/.env
 
+
+backend/seed.js
 # Logs
 *.log
