@@ -4,7 +4,7 @@
 
 ---
 
-## ⚡ Engineering Highlights (Internship Focus)
+## ⚡ Engineering Highlights 
 
 * **Optimized Analytics Engine:** Migrated complex financial computations from the frontend to **MongoDB Aggregation Pipelines**, resulting in an **80% reduction in dashboard latency** (from 1000ms to 200ms).
 * **Privacy-Preserving Benchmarking:** Engineered a **Spending Comparison** feature using `$facet` aggregations to compute anonymous community spending averages without compromising individual user data.
